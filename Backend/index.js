@@ -4,46 +4,78 @@
 const express = require("express");
 const app = express();
 
-const { createTodo , updateTodo}= require ("./types")
+//imported zod exported data here
+const { createTodo, updateTodo } = require("./types");
+
+//imported DB from dbMongoose.js file
+const { todo } = require("./dbMongoose");
+
 app.use(express.json());
 
-app.post("/todo", function (req, res) {
+app.post("/todo", async function (req, res) {
   // const title = req.body.title;
   // const description = req.body.description;
 
   const createPayload = req.body;
 
-  const parsedPayLoad= createTodo.safeParse(createPayload)
+  const parsedPayLoad = createTodo.safeParse(createPayload);
 
-  if(!parsedPayLoad.success){
+  if (!parsedPayLoad.success) {
     res.status(400).json({
-      msg:"invalid payload"
-    })
-    return
+      msg: "You sent the wrong inputs",
+    });
+    return;
   }
   //put it in mongoDb if all payload is correct
 
+  await todo.create({
+    title: createPayload.title,
+    description: createPayload.description,
+    completed: false,
+  });
 
-  const response = 
+  res.json({
+    msg: "Todo created",
+  });
 });
 
-app.get("/todos", function (req, res) {});
+app.get("/todos", function (req, res) {
+  //get the data from the request
+  const findTodos = todo.find({});
 
-app.put("/completed", function (req, res) {
+  res.json({
+    findTodos,
+  });
+});
+
+app.put("/completed", async function (req, res) {
   //get the data from the request
   const updatedPayload = req.body;
 
   //validate it
-  const parsedPayLoad= updateTodo.safeParse(updatedPayload)
+  const parsedPayLoad = updateTodo.safeParse(updatedPayload);
 
   // if not correct return error
-  if(!parsedPayLoad.success){
+  if (!parsedPayLoad.success) {
     res.status(400).json({
-      msg:"invalid payload"
-    })
-    return
+      msg: "invalid payload",
+    });
+    return;
   }
   //put it in mongoDb if all payload is correct
+  await todo.update(
+    {
+      //i wwant to update which has id as this
+      _id: req.body.id,
+    },
+    {
+      //update this
+      completed: true,
+    }
+  );
+  res.json({
+    msg: "Todo marked as completed",
+  });
 });
 
 app.listen(3000);
