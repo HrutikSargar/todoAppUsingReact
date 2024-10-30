@@ -8,10 +8,11 @@ const app = express();
 const { createTodo, updateTodo } = require("./types");
 
 //imported DB from dbMongoose.js file
-const { todo } = require("./dbMongoose");
+const { todos } = require("./dbMongoose");
 
 app.use(express.json());
 
+//TO SAVE TODO INTO DB
 app.post("/todo", async function (req, res) {
   // const title = req.body.title;
   // const description = req.body.description;
@@ -28,7 +29,9 @@ app.post("/todo", async function (req, res) {
   }
   //put it in mongoDb if all payload is correct
 
-  await todo.create({
+  //saving the data into the db
+  //save and create are used to store the data into the databases
+  await todos.create({
     title: createPayload.title,
     description: createPayload.description,
     completed: false,
@@ -39,15 +42,20 @@ app.post("/todo", async function (req, res) {
   });
 });
 
-app.get("/todos", function (req, res) {
-  //get the data from the request
-  const findTodos = todo.find({});
-
-  res.json({
-    findTodos,
-  });
+//TO FETCH ALL DATA FROM DB
+app.get("/todos", async function (req, res) {
+  try {
+    //get the data from the request
+    const findTodos = await todos.find();
+    res.json(findTodos);
+  } catch (error) {
+    res.status(500).json({
+      msg: "Something went wrong",
+    });
+  }
 });
 
+//TO UPDATE TODO AS DONE INTO DB
 app.put("/completed", async function (req, res) {
   //get the data from the request
   const updatedPayload = req.body;
@@ -63,7 +71,7 @@ app.put("/completed", async function (req, res) {
     return;
   }
   //put it in mongoDb if all payload is correct
-  await todo.update(
+  await todos.update(
     {
       //i wwant to update which has id as this
       _id: req.body.id,
