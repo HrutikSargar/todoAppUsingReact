@@ -1,0 +1,17 @@
+body {
+  margin: 0; /* Remove default body margin */
+  height: 100vh; /* Full height of the viewport */
+  display: flex; /* Use flexbox for centering */
+  align-items: center; /* Center vertically */
+  justify-content: center; /* Center horizontally */
+  background-color: #c56e6e; /* Optional: background color for the whole page */
+}
+
+.centered-box {
+  background-color: #4caf50; /* Change this to your desired color */
+  color: white; /* Text color */
+  padding: 20px; /* Spacing inside the box */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional: add some shadow */
+  text-align: center; /* Center text */
+}
